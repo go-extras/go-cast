@@ -1,5 +1,7 @@
 package cast
 
+import "math"
+
 // Int32 will return an int32 when `v` is of type int32, int16, int8, uint16, uint8 or has a method:
 //
 //	type interface {
@@ -76,6 +78,41 @@ func Int32(v interface{}) (int32, error) {
 			}
 			return int32(casted), nil
 		}()
+	case float32:
+		if value < math.MinInt32 || value > math.MaxInt32 {
+			return 0, internalCannotCastComplainer{expectedType:"int32", actualType:typeof(value), reason: "overflow"}
+		}
+
+		if math.Trunc(float64(value)) != float64(value) {
+			return 0, internalCannotCastComplainer{expectedType:"int32", actualType:typeof(value), reason: "decimal part found"}
+		}
+
+		return int32(value), nil
+	case float64:
+		if value < math.MinInt32 || value > math.MaxInt32 {
+			return 0, internalCannotCastComplainer{expectedType:"int32", actualType:typeof(value), reason: "overflow"}
+		}
+
+		if math.Trunc(value) != value {
+			return 0, internalCannotCastComplainer{expectedType:"int32", actualType:typeof(value), reason: "decimal part found"}
+		}
+
+		return int32(value), nil
+	case int64:
+		if value < math.MinInt32 || value > math.MaxInt32 {
+			return 0, internalCannotCastComplainer{expectedType:"int32", actualType:typeof(value), reason: "overflow"}
+		}
+		return int32(value), nil
+	case uint32:
+		if value > math.MaxInt32 {
+			return 0, internalCannotCastComplainer{expectedType:"int32", actualType:typeof(value), reason: "overflow"}
+		}
+		return int32(value), nil
+	case uint64:
+		if value > math.MaxInt32 {
+			return 0, internalCannotCastComplainer{expectedType:"int32", actualType:typeof(value), reason: "overflow"}
+		}
+		return int32(value), nil
 	case int32:
 		return int32(value), nil
 	case int16:

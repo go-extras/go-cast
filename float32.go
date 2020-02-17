@@ -1,5 +1,7 @@
 package cast
 
+import "math"
+
 // Float32 will return an float32 when `v` is of type float32, int16, int8, uint16, uint8 or has a method:
 //
 //	type interface {
@@ -70,11 +72,23 @@ func Float32(v interface{}) (float32, error) {
 			}
 			return float32(casted), nil
 		}()
+	case float64:
+		if math.Abs(value) > math.MaxFloat32 {
+			return 0, internalCannotCastComplainer{expectedType:"float32", actualType:typeof(value), reason: "overflow"}
+		}
+
+		return float32(value), nil
 	case float32:
+		return float32(value), nil
+	case int32:
 		return float32(value), nil
 	case int16:
 		return float32(value), nil
 	case int8:
+		return float32(value), nil
+	case uint64:
+		return float32(value), nil
+	case uint32:
 		return float32(value), nil
 	case uint16:
 		return float32(value), nil

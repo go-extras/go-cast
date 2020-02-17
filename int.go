@@ -1,5 +1,7 @@
 package cast
 
+import "math"
+
 // Int will return an int when `v` is of type int32, int16, int8, int, uint16, uint8 or has a method:
 //
 //      type interface {
@@ -95,6 +97,16 @@ func Int(v interface{}) (int, error) {
 	case uint16:
 		return int(value), nil
 	case uint8:
+		return int(value), nil
+	case float64:
+		if value < math.MinInt32 || value > math.MinInt32 {
+			return 0, internalCannotCastComplainer{expectedType:"int", actualType:typeof(value), reason: "overflow"}
+		}
+
+		if math.Trunc(value) != value {
+			return 0, internalCannotCastComplainer{expectedType:"int", actualType:typeof(value), reason: "decimal part found"}
+		}
+
 		return int(value), nil
 	default:
 		return 0, internalCannotCastComplainer{expectedType:"int", actualType:typeof(value)}

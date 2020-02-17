@@ -1,5 +1,7 @@
 package cast
 
+import "math"
+
 // Int64 will return an int64 when `v` is of type int64, int32, int16, int8, int, uint32, uint16, uint8 or has a method:
 //
 //	type interface {
@@ -127,6 +129,28 @@ func Int64(v interface{}) (int64, error) {
 	case uint16:
 		return int64(value), nil
 	case uint8:
+		return int64(value), nil
+	case uint64:
+		if value > math.MaxInt64 {
+			return 0, internalCannotCastComplainer{expectedType:"int64", actualType:typeof(value), reason: "overflow"}
+		}
+
+		return int64(value), nil
+	case float32:
+		if math.Trunc(float64(value)) != float64(value) {
+			return 0, internalCannotCastComplainer{expectedType:"int64", actualType:typeof(value), reason: "decimal part found"}
+		}
+
+		return int64(value), nil
+	case float64:
+		if value < math.MinInt64 || value > math.MaxInt64 {
+			return 0, internalCannotCastComplainer{expectedType:"int64", actualType:typeof(value), reason: "overflow"}
+		}
+
+		if math.Trunc(value) != value {
+			return 0, internalCannotCastComplainer{expectedType:"int64", actualType:typeof(value), reason: "decimal part found"}
+		}
+
 		return int64(value), nil
 	default:
 		return 0, internalCannotCastComplainer{expectedType:"int64", actualType:typeof(value)}

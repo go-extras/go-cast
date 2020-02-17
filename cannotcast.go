@@ -26,10 +26,15 @@ type CannotCastComplainer interface {
 type internalCannotCastComplainer struct{
 	expectedType string
 	actualType string
+	reason string
 }
 
-func (receiver internalCannotCastComplainer) Error() string {
-	return fmt.Sprintf("Cannot Cast: %q; expected something compatible with: %q", receiver.actualType, receiver.expectedType)
+func (r internalCannotCastComplainer) Error() string {
+	reason := r.reason
+	if reason == "" {
+		reason = "incompatible types"
+	}
+	return fmt.Sprintf("cannot cast %q to %q [reason: %s]", r.actualType, r.expectedType, reason)
 }
 
 func (internalCannotCastComplainer) CannotCastComplainer() {

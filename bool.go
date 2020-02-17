@@ -13,7 +13,27 @@ func Bool(v interface{}) (bool, error) {
 
 	switch value := v.(type) {
 	case bool:
-		return bool(value), nil
+		return value, nil
+	case int8:
+		return value != 0, nil
+	case int16:
+		return value != 0, nil
+	case int32:
+		return value != 0, nil
+	case int64:
+		return value != 0, nil
+	case uint8:
+		return value != 0, nil
+	case uint16:
+		return value != 0, nil
+	case uint32:
+		return value != 0, nil
+	case uint64:
+		return value != 0, nil
+	case float32:
+		return value != 0, nil
+	case float64:
+		return value != 0, nil
 	case booler:
 		return value.Bool()
 	default:

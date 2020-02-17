@@ -1,5 +1,7 @@
 package cast
 
+import "math"
+
 // Uint32 will return an int32 when `v` is of type uint32, uint16, uint8 or has a method:
 //
 //	type interface {
@@ -42,6 +44,62 @@ func Uint32(v interface{}) (uint32, error) {
 			}
 			return uint32(casted), nil
 		}()
+	case int64:
+		if value < 0 || value > math.MaxUint32 {
+			return 0, internalCannotCastComplainer{expectedType:"uint32", actualType:typeof(value), reason: "overflow"}
+		}
+
+		return uint32(value), nil
+	case int32:
+		if value < 0 {
+			return 0, internalCannotCastComplainer{expectedType:"uint32", actualType:typeof(value), reason: "overflow"}
+		}
+
+		return uint32(value), nil
+	case int16:
+		if value < 0 {
+			return 0, internalCannotCastComplainer{expectedType:"uint32", actualType:typeof(value), reason: "overflow"}
+		}
+
+		return uint32(value), nil
+	case int8:
+		if value < 0 {
+			return 0, internalCannotCastComplainer{expectedType:"uint32", actualType:typeof(value), reason: "overflow"}
+		}
+
+		return uint32(value), nil
+	case int:
+		if value < 0 || value > math.MaxUint32 {
+			return 0, internalCannotCastComplainer{expectedType:"uint32", actualType:typeof(value), reason: "overflow"}
+		}
+
+		return uint32(value), nil
+	case uint64:
+		if value > math.MaxInt64 {
+			return 0, internalCannotCastComplainer{expectedType:"uint32", actualType:typeof(value), reason: "overflow"}
+		}
+
+		return uint32(value), nil
+	case float32:
+		if value < 0 || value > math.MaxUint32 {
+			return 0, internalCannotCastComplainer{expectedType:"uint32", actualType:typeof(value), reason: "overflow"}
+		}
+
+		if math.Trunc(float64(value)) != float64(value) {
+			return 0, internalCannotCastComplainer{expectedType:"uint32", actualType:typeof(value), reason: "decimal part found"}
+		}
+
+		return uint32(value), nil
+	case float64:
+		if value < 0 || value > math.MaxUint32 {
+			return 0, internalCannotCastComplainer{expectedType:"uint32", actualType:typeof(value), reason: "overflow"}
+		}
+
+		if math.Trunc(value) != value {
+			return 0, internalCannotCastComplainer{expectedType:"uint32", actualType:typeof(value), reason: "decimal part found"}
+		}
+
+		return uint32(value), nil
 	case uint32:
 		return uint32(value), nil
 	case uint16:
